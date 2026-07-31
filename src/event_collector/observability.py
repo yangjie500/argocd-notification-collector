@@ -45,9 +45,7 @@ def configure_logging(settings: Settings) -> None:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(_log_level(settings.log_level))
         console_handler.setFormatter(
-            logging.Formatter(
-                "%(asctime)s %(levelname)s [%(name)s] %(message)s"
-            )
+            logging.Formatter("%(asctime)s %(levelname)s [%(name)s] %(message)s")
         )
         setattr(console_handler, _CONSOLE_HANDLER_MARKER, True)
         app_logger.addHandler(console_handler)
@@ -75,9 +73,7 @@ def configure_observability(settings: Settings) -> ObservabilityProviders:
         log_exporter._certificate_file = False  # type: ignore # noqa: SLF001
 
     log_provider = LoggerProvider(resource=resource)
-    log_provider.add_log_record_processor(
-        BatchLogRecordProcessor(log_exporter)
-    )
+    log_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
     set_logger_provider(log_provider)
 
     app_logger = logging.getLogger(_LOGGER_NAME)
