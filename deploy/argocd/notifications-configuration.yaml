@@ -1,0 +1,67 @@
+apiVersion: argoproj.io/v1alpha1
+kind: NotificationsConfiguration
+metadata:
+  name: default-notifications-configuration
+  namespace: openshift-gitops
+spec:
+  services:
+    service.webhook.deployment-events: |
+      url: "http://192.168.2.5:8000"
+      headers:
+        - name: Content-Type
+          value: application/json
+  subscriptions:
+    subscriptions: |
+      - recipients:
+          - deployment-events
+        triggers:
+          - on-application-deployed
+  templates:
+    template.application-deployed: |
+      webhook:
+        deployment-events:
+          method: POST
+          path: /api/v1/argocd/notifications
+          body: |
+            {{- $now := call .time.Now -}}
+            {{- $started := call .time.Parse .app.status.operationState.startedAt -}}
+            {{- $finished := call .time.Parse .app.status.operationState.finishedAt -}}
+            {{- $commit := call .repo.GetCommitMetadata .app.status.operationState.syncResult.revision -}}
+            {
+              "event_name": "argocd.application.deployed",
+              "application": "{{.app.metadata.name}}",
+              "project": "{{.app.spec.project}}",
+              "sync_status": "{{.app.status.sync.status}}",
+              "health_status": "{{.app.status.health.status}}",
+              "phase": "{{.app.status.operationState.phase}}",
+              "revision": "{{.app.status.operationState.syncResult.revision}}",
+              "message": "{{.app.status.operationState.message}}",
+
+              "application_uid": "{{.app.metadata.uid}}",
+              "application_namespace": "{{.app.metadata.namespace}}",
+              "repository": "{{.app.spec.source.repoURL}}",
+              "source_path": "{{.app.spec.source.path}}",
+              "target_revision": "{{.app.spec.source.targetRevision}}",
+              "destination_server": "{{.app.spec.destination.server}}",
+              "destination_namespace": "{{.app.spec.destination.namespace}}",
+
+              "deployment_started_at": "{{.app.status.operationState.startedAt}}",
+              "deployment_finished_at": "{{.app.status.operationState.finishedAt}}",
+              "notification_generated_at": "{{$now.Format "2006-01-02T15:04:05Z07:00"}}",
+
+              "sync_duration_seconds": {{($finished.Sub $started).Seconds}},
+              "notification_delay_seconds": {{($now.Sub $finished).Seconds}},
+              "commit_timestamp": "{{$commit.Date.Format "2006-01-02T15:04:05Z07:00"}}",
+              "commit_age_at_deployment_seconds": {{($finished.Sub $commit.Date).Seconds}}
+            }
+  triggers:
+    trigger.on-application-deployed: |
+      - when: app.status.operationState != nil
+          and app.status.operationState.syncResult != nil
+          and app.status.operationState.syncResult.revision != ''
+          and app.status.operationState.phase == 'Succeeded'
+          and app.status.sync.status == 'Synced'
+          and app.status.health.status == 'Healthy'
+        oncePer: app.status.operationState.startedAt
+        send:
+          - application-deployed

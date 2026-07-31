@@ -1,0 +1,16 @@
+# Changes here will be overwritten by Copier
+_commit: 5.3.0
+_src_path: https://github.com/DiamondLightSource/python-copier-template.git
+author_email: yj@freedomgowhere.com
+author_name: Yang Jie
+description: Backend to collect event from sources
+distribution_name: event-collector
+docker: true
+docs_type: README
+git_platform: github.com
+github_org: yangjie500
+package_name: event_collector
+pypi: true
+repo_name: event-collector
+strict_typing: true
+type_checker: pyright
