@@ -1,0 +1,28 @@
+{{- if .Values.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "event-collector.fullname" . }}
+  labels:
+    {{- include "event-collector.labels" . | nindent 4 }}
+  {{- with .Values.route.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.route.host }}
+  host: {{ . | quote }}
+  {{- end }}
+  path: {{ .Values.route.path | quote }}
+  to:
+    kind: Service
+    name: {{ include "event-collector.fullname" . }}
+    weight: 100
+  port:
+    targetPort: http
+  {{- if .Values.route.tls.enabled }}
+  tls:
+    termination: {{ .Values.route.tls.termination }}
+    insecureEdgeTerminationPolicy: {{ .Values.route.tls.insecureEdgeTerminationPolicy }}
+  {{- end }}
+{{- end }}

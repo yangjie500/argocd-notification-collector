@@ -1,0 +1,139 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/yangjie500/event-collector
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+  automountServiceAccountToken: false
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  annotations: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: event-collector.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+route:
+  enabled: false
+  host: ""
+  path: /
+  annotations: {}
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+networkPolicy:
+  enabled: false
+  ingress: []
+  egress: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+app:
+  environment: staging
+  logLevel: INFO
+  apiPrefix: /api/v1
+  docsEnabled: false
+  externalApiUrl: https://example.invalid
+  externalApiTimeoutSeconds: 10
+
+observability:
+  enabled: false
+  serviceName: event-collector
+  otlpLogsEndpoint: ""
+  authorizationHeader:
+    existingSecret: ""
+    existingSecretKey: authorization-header
+    value: ""
+  verifyTls: true
+
+webhookToken:
+  existingSecret: ""
+  existingSecretKey: argocd-webhook-token
+  value: ""
+
+extraEnv: []
+extraEnvFrom: []
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+startupProbe:
+  enabled: false
+  httpGet:
+    path: /health/live
+    port: http
+  failureThreshold: 30
+  periodSeconds: 2
