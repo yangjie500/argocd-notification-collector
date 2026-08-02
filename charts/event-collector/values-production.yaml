@@ -28,7 +28,7 @@ ingress:
 
 route:
   enabled: true
-  host: "xxx
+  host: "xxx"
   tls:
     enabled: true
     termination: edge
