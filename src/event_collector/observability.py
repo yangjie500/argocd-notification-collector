@@ -68,7 +68,10 @@ def configure_observability(settings: Settings) -> ObservabilityProviders:
         }
     )
 
-    log_exporter = OTLPLogExporter(endpoint=settings.observability_otlp_logs_endpoint)
+    log_exporter = OTLPLogExporter(
+        endpoint=settings.observability_otlp_logs_endpoint,
+        headers=otlp_headers(settings),
+    )
     if not settings.observability_verify_tls:
         log_exporter._certificate_file = False  # type: ignore # noqa: SLF001
 
@@ -112,3 +115,13 @@ def _log_level(level_name: str) -> int:
     if isinstance(level, int):
         return level
     return logging.INFO
+
+
+def otlp_headers(settings: Settings) -> dict[str, str] | None:
+    authorization_header = settings.observability_otlp_authorization_header
+    if authorization_header is None:
+        return None
+    authorization_header_value = authorization_header.get_secret_value()
+    if not authorization_header_value:
+        return None
+    return {"Authorization": authorization_header_value}

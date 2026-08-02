@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "event-collector.fullname" . }}
+  labels:
+    {{- include "event-collector.labels" . | nindent 4 }}
+data:
+  APP_NAME: {{ include "event-collector.name" . | quote }}
+  APP_ENVIRONMENT: {{ .Values.app.environment | quote }}
+  APP_LOG_LEVEL: {{ .Values.app.logLevel | quote }}
+  APP_API_PREFIX: {{ .Values.app.apiPrefix | quote }}
+  APP_DOCS_ENABLED: {{ .Values.app.docsEnabled | quote }}
+  APP_EXTERNAL_API_URL: {{ .Values.app.externalApiUrl | quote }}
+  APP_EXTERNAL_API_TIMEOUT_SECONDS: {{ .Values.app.externalApiTimeoutSeconds | quote }}
+  APP_OBSERVABILITY_ENABLED: {{ .Values.observability.enabled | quote }}
+  APP_OBSERVABILITY_SERVICE_NAME: {{ .Values.observability.serviceName | quote }}
+  APP_OBSERVABILITY_OTLP_LOGS_ENDPOINT: {{ .Values.observability.otlpLogsEndpoint | quote }}
+  APP_OBSERVABILITY_VERIFY_TLS: {{ .Values.observability.verifyTls | quote }}

@@ -1,0 +1,52 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/yangjie500/event-collector
+  tag: latest
+  pullPolicy: IfNotPresent
+
+app:
+  environment: local
+  logLevel: INFO
+  docsEnabled: false
+
+observability:
+  enabled: true
+  serviceName: event-collector
+  otlpLogsEndpoint: yyy
+  authorizationHeader:
+    existingSecret: event-collector-otel
+    existingSecretKey: authorization-header
+  verifyTls: false
+
+webhookToken:
+  existingSecret: event-collector-webhook
+  existingSecretKey: argocd-webhook-token
+
+ingress:
+  enabled: false
+
+route:
+  enabled: true
+  host: "xxx
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+networkPolicy:
+  enabled: false

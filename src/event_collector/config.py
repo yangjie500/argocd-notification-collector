@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     observability_enabled: bool = False
     observability_service_name: str = "event-collector"
     observability_otlp_logs_endpoint: str | None = None
+    observability_otlp_authorization_header: SecretStr | None = None
     observability_verify_tls: bool = True
 
     api_prefix: str = "/api/v1"

@@ -1,0 +1,16 @@
+event-collector has been installed.
+
+Service:
+  {{ include "event-collector.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+
+Webhook endpoint:
+  http://{{ include "event-collector.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local{{ .Values.app.apiPrefix }}/argocd/notifications
+
+Health checks:
+  /health/live
+  /health/ready
+
+If app.environment is production, configure the Argo CD webhook token with either:
+  webhookToken.existingSecret
+or:
+  webhookToken.value
