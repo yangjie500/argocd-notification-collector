@@ -1,7 +1,7 @@
-replicaCount: 2
+replicaCount: 1
 
 image:
-  repository: ghcr.io/yangjie500/event-collector
+  repository: ghcr.io/yangjie500/argocd-notification-collector
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -13,15 +13,17 @@ app:
 observability:
   enabled: true
   serviceName: event-collector
-  otlpLogsEndpoint: yyy
+  otlpLogsEndpoint: xxx
   authorizationHeader:
-    existingSecret: event-collector-otel
+    existingSecret: ""
     existingSecretKey: authorization-header
+    value: "xxx"
   verifyTls: false
 
 webhookToken:
-  existingSecret: event-collector-webhook
+  existingSecret: ""
   existingSecretKey: argocd-webhook-token
+  value: ""
 
 ingress:
   enabled: false
