@@ -6,7 +6,8 @@ metadata:
 spec:
   services:
     service.webhook.deployment-events: |
-      url: "http://192.168.2.5:8000"
+      url: "http://xxx:xxx"
+      insecureSkipVerify: true
       headers:
         - name: Content-Type
           value: application/json
@@ -30,7 +31,9 @@ spec:
             {
               "event_name": "argocd.application.deployed",
               "application": "{{.app.metadata.name}}",
+              "tenant_id": "{{ index .app.metadata.labels "tenantId"}}"
               "project": "{{.app.spec.project}}",
+              "project_name": "{{ index .app.metadata.labels "projectName" }}",
               "sync_status": "{{.app.status.sync.status}}",
               "health_status": "{{.app.status.health.status}}",
               "phase": "{{.app.status.operationState.phase}}",
